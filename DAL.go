@@ -13,7 +13,7 @@ func New(stor IStorage) IDAL {
 }
 
 func (this DAL) FindUser(user APIUser) (APIUser, error) {
-	if apiUser, err := this.stor.Read(user); err == nil {
+	if apiUser, err := this.stor.Read(user); err == nil && apiUser != nil {
 		return (apiUser).(APIUser), err
 	} else {
 		return APIUser{}, err
@@ -21,7 +21,7 @@ func (this DAL) FindUser(user APIUser) (APIUser, error) {
 }
 
 func (this DAL) CreateUser(user APIUser) (APIUser, error) {
-	if apiUser, err := this.stor.Create(user); err == nil {
+	if apiUser, err := this.stor.Create(user); err == nil && apiUser != nil {
 		return (apiUser).(APIUser), err
 	} else {
 		return APIUser{}, err
@@ -29,7 +29,7 @@ func (this DAL) CreateUser(user APIUser) (APIUser, error) {
 }
 
 func (this DAL) UpdateUser(user APIUser) (APIUser, error) {
-	if apiUser, err := this.stor.Update(user); err == nil {
+	if apiUser, err := this.stor.Update(user); err == nil && apiUser != nil {
 		return (apiUser).(APIUser), err
 	} else {
 		return APIUser{}, err
@@ -37,7 +37,7 @@ func (this DAL) UpdateUser(user APIUser) (APIUser, error) {
 }
 
 func (this DAL) DeleteUser(user APIUser) (APIUser, error) {
-	if apiUser, err := this.stor.Delete(user); err == nil {
+	if apiUser, err := this.stor.Delete(user); err == nil && apiUser != nil {
 		return (apiUser).(APIUser), err
 	} else {
 		return APIUser{}, err

@@ -51,7 +51,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 func Read(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	token := vars["token"]
-	if user, err := dal.FindUser(APIUser{"", "", token}); err == nil {
+	if user, err := dal.FindUser(APIUser{"", "", token}); err == nil && (user != APIUser{}) {
 		log.Printf("User[%q] found: %q\n", token, user)
 		printResponse(w, http.StatusOK, APIMessage{http.StatusOK, user})
 	} else {
@@ -78,11 +78,14 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 	if err := json.Unmarshal(body, &user); err != nil {
 		printResponse(w, 422, APIMessage{422, "Unprocessable entity"})
 	}
-	printResponse(w, http.StatusOK, APIMessage{http.StatusOK, user})
-}
 
-func ListAll(w http.ResponseWriter, r *http.Request) {
-	//printResponse(w, http.StatusOK, APIMessage{http.StatusOK, dal.FindUser(APIUser{})})
+	if delUser, err := dal.DeleteUser(user); err == nil && (user != APIUser{}) {
+		log.Printf("User[%q] deleted\n", user.Token)
+		printResponse(w, http.StatusOK, APIMessage{http.StatusOK, delUser})
+	} else {
+		log.Printf("Error deleting User[%q], %q\n", user.Token, err)
+		printResponse(w, http.StatusOK, APIMessage{http.StatusOK, err})
+	}
 }
 
 func printResponse(w http.ResponseWriter, status int, message interface{}) {
@@ -94,10 +97,10 @@ func printResponse(w http.ResponseWriter, status int, message interface{}) {
 }
 
 func isRegistered(user APIUser) bool {
-	if _, err := dal.FindUser(user); err != nil {
-		return false
+	if user, err := dal.FindUser(user); err == nil && (user != APIUser{}) {
+		return true
 	}
-	return true
+	return false
 }
 
 func sleep(tts int64) {

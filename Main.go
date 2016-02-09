@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	log.Printf("Starting API version `%s`", apiVersion)
+	log.Printf("Starting app ... ")
 	router := NewRouter()
 	log.Fatal(http.ListenAndServe("0.0.0.0:6060", router))
 }

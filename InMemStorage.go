@@ -28,8 +28,7 @@ func (this InMemStorage) Read(data interface{}) (interface{}, error) {
 		if retUser, userOk := this.apiUsers[user.Token]; userOk {
 			return retUser, nil
 		} else {
-			log.Print("User not found in DB")
-			return nil, errors.New("User not found in DB")
+			return nil, nil
 		}
 	} else {
 		log.Print("Can't find user: uncoprehensible input")
@@ -41,15 +40,15 @@ func (this InMemStorage) Update(data interface{}) (interface{}, error) {
 	if user, ok := data.(APIUser); ok {
 		apiMutex.Lock()
 		defer apiMutex.Unlock()
-		if _, userOk := this.apiUsers[user.Token]; userOk {
-			return nil, errors.New("Updating of nonexistent user")
+		retUser, userOk := this.apiUsers[user.Token]
+		this.apiUsers[user.Token] = user
+		if userOk {
+			return retUser, nil
 		} else {
-			apiMutex.Lock()
-			defer apiMutex.Unlock()
-			this.apiUsers[user.Token] = user
-			return user, nil
+			return nil, nil
 		}
 	} else {
+		log.Print("Can't update user: uncoprehensible input")
 		return nil, errors.New("Can't update user: uncoprehensible input")
 	}
 }
@@ -64,9 +63,10 @@ func (this InMemStorage) Delete(data interface{}) (interface{}, error) {
 			delete(this.apiUsers, user.Token)
 			return retUser, nil
 		} else {
-			return nil, errors.New("Deleting of nonexistent user")
+			return nil, nil
 		}
 	} else {
+		log.Print("Can't delete user: uncoprehensible input")
 		return nil, errors.New("Cant't delete user: uncoprehensible input")
 	}
 }
